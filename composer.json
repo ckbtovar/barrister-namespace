@@ -1,5 +1,5 @@
 {
-    "name": "iamawongck/barrister-namespace",
+    "name": "ckbtovar/barrister-namespace",
     "autoload": {
         "psr-0": {"Barrister": ["/"]}
     }
