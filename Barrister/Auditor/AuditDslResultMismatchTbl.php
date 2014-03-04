@@ -89,7 +89,7 @@ class AuditDslResultMismatchTbl extends SuperTbl implements AuditMismatchTbl {
 
     public function insertQueryProfile($barristerId, $query, $params) {
         $values = [
-            self::C_BARRISTER_ID => "53164119e41ff5.66418879", //$barristerId,
+            self::C_BARRISTER_ID => $barristerId,
             self::C_DSL_QUERY => $query,
             self::C_DSL_PARAMS => implode(',', $params)
         ];
