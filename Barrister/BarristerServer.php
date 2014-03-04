@@ -2,6 +2,8 @@
 
 namespace Barrister;
 
+use Barrister\Auditor\BarristerAuditor;
+use Barrister\Auditor\Interfaces\Auditor;
 use Barrister\Exception\BarristerRpcException;
 use Barrister\Exception\IncompatibleIDLException;
 use Barrister\Exception\IncompleteRequestException;
@@ -26,6 +28,30 @@ class BarristerServer {
      * @var BarristerJsonDecoder
      */
     public $jsonDecoder;
+
+    /**
+     * @var Auditor $auditor
+     */
+    private $auditor;
+
+    public function getAuditor() {
+        if (!isset($this->auditor)) {
+            $this->auditor = new BarristerAuditor();
+        }
+
+        return $this->auditor;
+    }
+
+    /**
+     * @param Auditor $auditor
+     */
+    public function setAuditor($auditor=null) {
+        if (!isset($auditor)) {
+            $auditor = new BarristerAuditor();
+        }
+
+        $this->auditor = $auditor;
+    }
 
     /**
      * @param                      $idlFile
@@ -159,8 +185,12 @@ class BarristerServer {
             throw new IncompatibleIDLException("Method not found: $method");
         }
 
-
-        $result = $reflectMethod->invokeArgs($handler, $params);
+        if ($this->isInAuditMode()) {
+            $aud = $this->getAuditor();
+            $result = $aud->audit($reflectMethod, $handler, $params, $req->id);
+        } else {
+            $result = $reflectMethod->invokeArgs($handler, $params);
+        }
 
         $invalid = $funcInst->validateResult($this->contract, $result);
         if ($invalid !== null) {
@@ -211,5 +241,9 @@ class BarristerServer {
         else {
             throw new IncompleteRequestException("Invalid request method when trying to get interface and function: $method");
         }
+    }
+
+    private function isInAuditMode() {
+        return $this->getAuditor()->isInAuditMode();
     }
 }
