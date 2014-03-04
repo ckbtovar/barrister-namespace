@@ -187,10 +187,10 @@ class BarristerServer {
 
         if ($this->isInAuditMode()) {
             $aud = $this->getAuditor();
-            $aud->audit($reflectMethod, $handler, $params, $req->id);
+            $result = $aud->audit($reflectMethod, $handler, $params, $req->id);
+        } else {
+            $result = $reflectMethod->invokeArgs($handler, $params);
         }
-
-        $result = $reflectMethod->invokeArgs($handler, $params);
 
         $invalid = $funcInst->validateResult($this->contract, $result);
         if ($invalid !== null) {

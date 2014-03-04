@@ -94,7 +94,6 @@ class AuditDslResultMismatchTbl extends SuperTbl implements AuditMismatchTbl {
             self::C_DSL_PARAMS => implode(',', $params)
         ];
 
-//        $this->insert($values, true);
         $this->insertOnDuplicate($values, $values);
     }
 }
